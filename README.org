@@ -1,0 +1,5 @@
+* This is for automatically downloading data from KRX
+* Usage
+#+BEGIN_EXAMPLE
+docker run -it -e GITHUB_USER=Arbitrageur -e GITHUB_REPO=some_repo -e KRX_USER=someuser -e KRX_PASS=secret -v `pwd`:/secrets krx_downloader
+#+END_EXAMPLE
