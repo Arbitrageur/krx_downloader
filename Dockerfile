@@ -23,10 +23,14 @@ RUN mkdir .ssh
 
 RUN mkdir /script
 WORKDIR /script
-COPY *.py /script/
-COPY run /script/
-RUN chmod a+x /script/run
+ADD *.py /script/
+ADD run /script/
+ADD crontab /script/
+RUN chmod 755 /script/crontab
+RUN /usr/bin/crontab /script/crontab
 
-RUN echo '0 8 * * *    /script/run' >> /etc/crontabs/root
+ADD entry /script/
+RUN chmod 755 /script/run
+RUN chmod 755 /script/entry
 
-CMD ['crond', '-l 2', 'f']
+CMD ["/script/entry"]
