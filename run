@@ -4,7 +4,7 @@ REPO_DIR=/root/$GITHUB_REPO
 
 
 cd /root
-[ -f /secrets/id_rsa ] && cp /secrets/id_rsa /root/.ssh
+[ -f /secrets/id_rsa ] && cp /secrets/id_rsa /root/.ssh && chmod 600 /root/.ssh/id_rsa
 
 KNOWNHOST=0
 if [ -f /root/.ssh/known_hosts ]; then
@@ -18,7 +18,13 @@ fi
 git config --global user.email "yeolhyun.kwon@gmail.com"
 git config --global user.name "Yeolhyun Kwon"
 
-[ ! -d $REPO_DIR ] && git clone git@github.com:$GITHUB_USER/$GITHUB_REPO
+if [ -d $REPO_DIR ]; then
+    cd $REPO_DIR
+    git pull
+else
+    cd /root
+    git clone git@github.com:$GITHUB_USER/$GITHUB_REPO
+fi
 
 cd /script
 

@@ -4,6 +4,7 @@ import os
 import glob
 import time
 import sys
+import json
 
 from driver_builder import DriverBuilder
 from selenium.webdriver.common.by import By
