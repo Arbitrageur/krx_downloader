@@ -9,9 +9,10 @@ ENV KRX_PASS=secret
 ENV PASSPHRASE=passphrase
 
 RUN apk update
-RUN apk add git openssh-client
-
+RUN apk add git openssh-client tzdata
 RUN apk add build-base
+RUN cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+RUN echo "Asia/Seoul" > /etc/timezone
 
 RUN pip install pycryptodomex
 

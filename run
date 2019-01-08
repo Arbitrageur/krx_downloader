@@ -1,17 +1,26 @@
 #!/bin/sh
 
+log() {
+    echo $(date +"%Y-%m-%d %T::")"$1::$2"
+}
+
 REPO_DIR=/root/$GITHUB_REPO
 
 
 cd /root
-[ -f /secrets/id_rsa ] && cp /secrets/id_rsa /root/.ssh && chmod 600 /root/.ssh/id_rsa
+if [ -f /secrets/id_rsa ]; then
+    log COPY_SSH_KEY "Found a key file"
+    cp /secrets/id_rsa /root/.ssh
+    chmod 600 /root/.ssh/id_rsa
+fi
 
 KNOWNHOST=0
 if [ -f /root/.ssh/known_hosts ]; then
     KNOWNHOST=$(cat /root/.ssh/known_hosts | grep ^github.com | wc -l | tr -d "[:blank:]")
 fi
-
+log KNOWNHOST $KNOWNHOST
 if [ $KNOWNHOST == 0 ]; then
+    log KNOWNHOST "Try to add github.com to the known_hosts file"
     ssh -T -o "StrictHostKeyChecking no" git@github.com
 fi
 
@@ -19,9 +28,11 @@ git config --global user.email "yeolhyun.kwon@gmail.com"
 git config --global user.name "Yeolhyun Kwon"
 
 if [ -d $REPO_DIR ]; then
+    log "GITHUB" "Pulling from github"
     cd $REPO_DIR
     git pull
 else
+    log "GITHUB" "No Repo. Cloning from github."
     cd /root
     git clone git@github.com:$GITHUB_USER/$GITHUB_REPO
 fi
@@ -29,15 +40,17 @@ fi
 cd /script
 
 if [ -f /secrets/cred.json ]; then
+    log "PYTHON" "Starting downloading index data"
     python downloader.py /secrets/cred.json
 else
-    echo "/secrets/cred.json DOES NOT exist."
+    log "PYTHON" "No credential information"
 fi
 
 for file in *.enc
 do
     newfilename=$(echo $file | sed 's/IndexData_\(.*\).zip.enc/\1/g')
     if [ ! -e $REPO_DIR/$newfilename.enc ]; then
+        log "COPY" "New index info file ($file:$newfilename)"
         mv $file $REPO_DIR/$newfilename.enc
         cd $REPO_DIR
         git add $newfilename.enc
